@@ -168,29 +168,6 @@ index.html
 
 ---
 
-# 📸 Application Screenshots
-
-### Homepage
-
-*Add screenshot*
-
-### Login & Register
-
-*Add screenshot*
-
-### AI Chatbot
-
-*Add screenshot*
-
-### Mood Tracker
-
-*Add screenshot*
-
-### Counselor Booking
-
-*Add screenshot*
-
----
 
 # 📞 Mental Health Helplines (India)
 
