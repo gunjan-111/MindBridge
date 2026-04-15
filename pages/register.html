@@ -1,4 +1,374 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Account — MindBridge</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    body { background: var(--light, #f8f7ff); min-height: 100vh; display: flex; flex-direction: column; }
+    .auth-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; padding: 100px 16px 40px; }
+    .auth-card {
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(108,99,255,.12);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 480px;
+    }
+    .auth-logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 24px; }
+    .auth-logo .brand-icon { background: linear-gradient(135deg,#6c63ff,#f5576c); border-radius: 12px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; }
+    .auth-logo .brand-text { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: #1a1a2e; }
+    .auth-logo .brand-text span { color: #6c63ff; }
+
+    /* Progress steps */
+    .steps-bar { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 28px; }
+    .step-dot {
+      width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .85rem; border: 2px solid #e0dff5; color: #aaa; background: #fff;
+      transition: all .3s; position: relative; z-index: 1;
+    }
+    .step-dot.active { border-color: #6c63ff; color: #6c63ff; background: #f0effe; }
+    .step-dot.done { border-color: #6c63ff; background: #6c63ff; color: #fff; }
+    .step-line { flex: 1; height: 2px; background: #e0dff5; max-width: 60px; transition: background .3s; }
+    .step-line.done { background: #6c63ff; }
+
+    .auth-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: #1a1a2e; text-align: center; margin-bottom: 4px; }
+    .auth-sub { color: #666; text-align: center; font-size: .9rem; margin-bottom: 24px; }
+    .form-label { font-weight: 500; color: #333; font-size: .9rem; }
+    .form-control {
+      border: 1.5px solid #e0dff5;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: .95rem;
+      transition: border-color .2s;
+    }
+    .form-control:focus { border-color: #6c63ff; box-shadow: 0 0 0 3px rgba(108,99,255,.1); }
+    .input-group .form-control { border-right: none; border-radius: 12px 0 0 12px; }
+    .input-group .btn-outline-secondary {
+      border: 1.5px solid #e0dff5; border-left: none;
+      border-radius: 0 12px 12px 0; background: #fafafa; color: #888;
+    }
+
+    /* Goal chips */
+    .goal-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 20px; border: 1.5px solid #e0dff5;
+      cursor: pointer; font-size: .875rem; font-weight: 500; color: #555;
+      transition: all .2s; margin: 4px;
+    }
+    .goal-chip:hover { border-color: #6c63ff; color: #6c63ff; }
+    .goal-chip.selected { border-color: #6c63ff; background: #f0effe; color: #6c63ff; }
+
+    /* Support type cards */
+    .support-card {
+      border: 1.5px solid #e0dff5; border-radius: 14px; padding: 16px;
+      cursor: pointer; transition: all .2s; margin-bottom: 10px;
+    }
+    .support-card:hover { border-color: #6c63ff; }
+    .support-card.selected { border-color: #6c63ff; background: #f0effe; }
+    .support-card h6 { margin: 0; font-weight: 600; color: #1a1a2e; font-size: .95rem; }
+    .support-card p { margin: 4px 0 0; font-size: .82rem; color: #888; }
+    .support-card i { font-size: 1.4rem; color: #6c63ff; margin-bottom: 6px; }
+
+    .btn-auth {
+      background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+      color: #fff; border: none; border-radius: 12px;
+      padding: 13px; font-weight: 600; font-size: 1rem;
+      width: 100%; transition: transform .15s, box-shadow .15s;
+    }
+    .btn-auth:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,.3); color: #fff; }
+    .btn-auth:disabled { opacity: .7; transform: none; }
+    .btn-back {
+      background: transparent; color: #6c63ff; border: 1.5px solid #6c63ff;
+      border-radius: 12px; padding: 12px; font-weight: 600; font-size: 1rem;
+      width: 100%; transition: all .15s;
+    }
+    .btn-back:hover { background: #f0effe; }
+    .alert-auth { border-radius: 12px; font-size: .9rem; }
+    .auth-switch { text-align: center; font-size: .9rem; color: #666; margin-top: 20px; }
+    .auth-switch a { color: #6c63ff; font-weight: 600; text-decoration: none; }
+
+    /* Step panels */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+
+    /* Success screen */
+    .success-icon { width: 80px; height: 80px; background: linear-gradient(135deg,#43e97b,#38f9d7); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: #fff; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+      <span class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></span>
+      <span class="brand-text">Mind<span>Bridge</span></span>
+    </a>
+  </div>
+</nav>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+      <div class="brand-text">Mind<span>Bridge</span></div>
+    </div>
+
+    <!-- Steps indicator -->
+    <div class="steps-bar" id="stepsBar">
+      <div class="step-dot active" id="dot1">1</div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-dot" id="dot2">2</div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-dot" id="dot3">3</div>
+    </div>
+
+    <div id="alertBox" class="alert alert-auth d-none"></div>
+
+    <!-- ── STEP 1: Basic Info ── -->
+    <div class="step-panel active" id="step1">
+      <h2 class="auth-title">Create Your Account</h2>
+      <p class="auth-sub">Your safe space starts here. Let's get you set up.</p>
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-control" id="firstName" placeholder="Aanya"/>
+        </div>
+        <div class="col-6">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="lastName" placeholder="Sharma"/>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-control" id="email" placeholder="you@example.com"/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <div class="input-group">
+          <input type="password" class="form-control" id="password" placeholder="Min. 8 characters"/>
+          <button class="btn btn-outline-secondary" type="button" id="togglePwd">
+            <i class="bi bi-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+        <div class="mt-1" id="pwdStrength" style="font-size:.8rem;"></div>
+      </div>
+      <button class="btn-auth" onclick="goStep2()">Continue <i class="bi bi-arrow-right ms-1"></i></button>
+      <div class="auth-switch">Already have an account? <a href="login.html">Log in</a></div>
+    </div>
+
+    <!-- ── STEP 2: Goals ── -->
+    <div class="step-panel" id="step2">
+      <h2 class="auth-title">What Brings You Here? 💬</h2>
+      <p class="auth-sub">Select all that apply — this helps us personalise your experience.</p>
+      <div class="text-center mb-3">
+        <span class="goal-chip" onclick="toggleGoal(this,'anxiety')"><i class="bi bi-cloud-drizzle"></i> Anxiety</span>
+        <span class="goal-chip" onclick="toggleGoal(this,'depression')"><i class="bi bi-moon-stars"></i> Depression</span>
+        <span class="goal-chip" onclick="toggleGoal(this,'stress')"><i class="bi bi-lightning"></i> Stress</span>
+        <span class="goal-chip" onclick="toggleGoal(this,'relationships')"><i class="bi bi-people"></i> Relationships</span>
+        <span class="goal-chip" onclick="toggleGoal(this,'sleep')"><i class="bi bi-moon"></i> Sleep Issues</span>
+        <span class="goal-chip" onclick="toggleGoal(this,'grief')"><i class="bi bi-heart-break"></i> Grief</span>
+        <span class="goal-chip" onclick="toggleGoal(this,'self-esteem')"><i class="bi bi-person-heart"></i> Self-Esteem</span>
+        <span class="goal-chip" onclick="toggleGoal(this,'work')"><i class="bi bi-briefcase"></i> Work-Life Balance</span>
+      </div>
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn-back" onclick="goStep(1)"><i class="bi bi-arrow-left me-1"></i> Back</button>
+        <button class="btn-auth" onclick="goStep3()">Continue <i class="bi bi-arrow-right ms-1"></i></button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Support Type ── -->
+    <div class="step-panel" id="step3">
+      <h2 class="auth-title">How Can We Help? 🌿</h2>
+      <p class="auth-sub">Choose your preferred type of support.</p>
+      <div class="support-card" onclick="selectSupport(this,'ai-chat')">
+        <i class="bi bi-robot"></i>
+        <h6>AI Support (Aria)</h6>
+        <p>Chat with our AI companion 24/7 for immediate, empathetic support.</p>
+      </div>
+      <div class="support-card" onclick="selectSupport(this,'counselor')">
+        <i class="bi bi-person-badge-fill"></i>
+        <h6>Professional Counselling</h6>
+        <p>Book sessions with licensed therapists for deeper, structured support.</p>
+      </div>
+      <div class="support-card" onclick="selectSupport(this,'self-help')">
+        <i class="bi bi-journal-heart"></i>
+        <h6>Self-Help Tools</h6>
+        <p>Use mood tracking, journaling, and wellness exercises at your own pace.</p>
+      </div>
+      <div class="support-card" onclick="selectSupport(this,'all')">
+        <i class="bi bi-stars"></i>
+        <h6>All of the Above</h6>
+        <p>Get full access to everything MindBridge has to offer.</p>
+      </div>
+      <div id="loadingSpinner" class="text-center d-none my-2">
+        <div class="spinner-border text-primary" role="status" style="width:1.5rem;height:1.5rem;"></div>
+        <span class="ms-2 text-muted">Creating your account...</span>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn-back" onclick="goStep(2)"><i class="bi bi-arrow-left me-1"></i> Back</button>
+        <button class="btn-auth" id="registerBtn" onclick="handleRegister()">Create Account 🎉</button>
+      </div>
+    </div>
+
+    <!-- ── SUCCESS ── -->
+    <div class="step-panel" id="stepSuccess">
+      <div class="text-center">
+        <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+        <h2 class="auth-title">Welcome to MindBridge! 🎉</h2>
+        <p class="auth-sub" id="welcomeName">You're all set. Your safe space is ready.</p>
+        <a href="../index.html" class="btn-auth d-block mt-3" style="text-decoration:none;text-align:center;padding:13px;">
+          Go to Homepage <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+        <a href="chat.html" class="btn-back d-block mt-2" style="text-decoration:none;text-align:center;padding:12px;">
+          <i class="bi bi-chat-heart me-1"></i> Chat with Aria Now
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Redirect if already logged in
+  if (localStorage.getItem('mb_token')) {
+    window.location.href = '../index.html';
+  }
+
+  let selectedGoals = [];
+  let selectedSupport = '';
+
+  // Password visibility
+  document.getElementById('togglePwd').addEventListener('click', () => {
+    const pwd = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    icon.className = pwd.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+  });
+
+  // Password strength indicator
+  document.getElementById('password').addEventListener('input', function() {
+    const v = this.value;
+    const el = document.getElementById('pwdStrength');
+    if (!v) { el.textContent = ''; return; }
+    if (v.length < 6) { el.innerHTML = '<span class="text-danger">Weak</span>'; }
+    else if (v.length < 10) { el.innerHTML = '<span class="text-warning">Medium</span>'; }
+    else { el.innerHTML = '<span class="text-success">Strong ✓</span>'; }
+  });
+
+  function showAlert(msg, type = 'danger') {
+    const box = document.getElementById('alertBox');
+    box.className = `alert alert-${type} alert-auth`;
+    box.textContent = msg;
+    box.classList.remove('d-none');
+  }
+
+  function hideAlert() {
+    document.getElementById('alertBox').classList.add('d-none');
+  }
+
+  function updateStepUI(step) {
+    [1, 2, 3].forEach(i => {
+      const dot = document.getElementById('dot' + i);
+      if (i < step) { dot.className = 'step-dot done'; dot.innerHTML = '<i class="bi bi-check"></i>'; }
+      else if (i === step) { dot.className = 'step-dot active'; dot.textContent = i; }
+      else { dot.className = 'step-dot'; dot.textContent = i; }
+    });
+    [1, 2].forEach(i => {
+      document.getElementById('line' + i).className = 'step-line' + (i < step ? ' done' : '');
+    });
+  }
+
+  function goStep(num) {
+    hideAlert();
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('step' + num).classList.add('active');
+    updateStepUI(num);
+  }
+
+  function goStep2() {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (!firstName || !lastName) { showAlert('Please enter your first and last name.'); return; }
+    if (!email || !/\S+@\S+\.\S+/.test(email)) { showAlert('Please enter a valid email address.'); return; }
+    if (password.length < 8) { showAlert('Password must be at least 8 characters.'); return; }
+    goStep(2);
+  }
+
+  function goStep3() {
+    goStep(3);
+  }
+
+  function toggleGoal(el, goal) {
+    el.classList.toggle('selected');
+    if (el.classList.contains('selected')) {
+      if (!selectedGoals.includes(goal)) selectedGoals.push(goal);
+    } else {
+      selectedGoals = selectedGoals.filter(g => g !== goal);
+    }
+  }
+
+  function selectSupport(el, type) {
+    document.querySelectorAll('.support-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedSupport = type;
+  }
+
+  async function handleRegister() {
+    if (!selectedSupport) {
+      showAlert('Please select a support type before continuing.');
+      return;
+    }
+
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    document.getElementById('registerBtn').disabled = true;
+    document.getElementById('loadingSpinner').classList.remove('d-none');
+    hideAlert();
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, password, goals: selectedGoals, supportType: selectedSupport })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showAlert(data.message || 'Registration failed. Please try again.');
+      } else {
+        // ✅ Save to localStorage
+        localStorage.setItem('mb_token', data.token);
+        localStorage.setItem('mb_user', JSON.stringify(data.user));
+
+        // Show success screen
+        document.getElementById('stepsBar').style.display = 'none';
+        document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('stepSuccess').classList.add('active');
+        document.getElementById('welcomeName').textContent = `Hey ${firstName}, your safe space is ready. 💙`;
+      }
+    } catch (err) {
+      showAlert('Could not connect to server. Make sure the backend is running (npm start).');
+    } finally {
+      document.getElementById('registerBtn').disabled = false;
+      document.getElementById('loadingSpinner').classList.add('d-none');
+    }
+  }
+</script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
 
 <html lang="en">
 
@@ -258,4 +628,4 @@ alert(data.message)
 </script>
 
 </body>
-</html>
+</html> -->
