@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mood Tracker — MindBridge</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    body { background: var(--light-bg); }
+    .tracker-card { background:white;border:1px solid var(--border);border-radius:var(--radius);padding:2rem; }
+    .mood-large-btn { border:2px solid var(--border);border-radius:16px;padding:1.25rem 0.75rem;text-align:center;cursor:pointer;transition:all 0.2s;background:white;font-family:var(--ff-body);width:100%; }
+    .mood-large-btn .emoji { font-size:2.2rem;line-height:1;display:block; }
+    .mood-large-btn .label { font-size:0.78rem;font-weight:500;color:var(--muted);display:block;margin-top:6px; }
+    .mood-large-btn:hover, .mood-large-btn.active { border-color:var(--brand);background:var(--teal-light);transform:translateY(-3px);box-shadow:0 4px 16px var(--brand-glow); }
+    .mood-large-btn.active .label { color:var(--brand); }
+    .intensity-slider { -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:linear-gradient(to right,var(--brand) 0%,var(--teal-light) 100%);outline:none; }
+    .intensity-slider::-webkit-slider-thumb { -webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--brand);cursor:pointer;box-shadow:0 2px 8px rgba(13,148,136,0.4); }
+    .tag-btn { border:1.5px solid var(--border);border-radius:100px;padding:0.3rem 0.8rem;font-size:0.78rem;cursor:pointer;background:white;transition:all 0.15s;font-family:var(--ff-body); }
+    .tag-btn:hover, .tag-btn.active { border-color:var(--brand);background:var(--teal-light);color:var(--brand); }
+    .log-item { border-left:4px solid var(--brand);background:white;border-radius:0 12px 12px 0;padding:0.75rem 1rem;margin-bottom:10px; }
+    .streak-badge { background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border-radius:12px;padding:0.75rem 1.25rem;text-align:center; }
+    .insight-card { background:white;border:1px solid var(--border);border-radius:12px;padding:1.25rem;border-left:4px solid var(--purple); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+      <span class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></span>
+      <span class="brand-text">Mind<span>Bridge</span></span>
+    </a>
+    <div class="ms-auto d-flex gap-2">
+      <a href="chat.html" class="btn btn-outline-brand btn-sm">Talk to Aria</a>
+      <a href="login.html" class="btn btn-brand btn-sm">My Account</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="section-tag" style="background:rgba(255,255,255,0.2);color:white">Self-Awareness</div>
+    <h1 class="mt-2">Your Mood Tracker</h1>
+    <p class="mt-2">Log how you feel each day and discover patterns that help you understand yourself better.</p>
+  </div>
+</div>
+
+<div class="section-pad">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left: Log Today -->
+      <div class="col-lg-7">
+        <div class="tracker-card mb-4">
+          <h5 class="mb-1">How are you feeling today?</h5>
+          <p class="text-muted mb-3" style="font-size:0.85rem" id="todayDate"></p>
+          <div class="row g-2 mb-4">
+            <div class="col"><button class="mood-large-btn" data-val="1" onclick="setMood(this)"><span class="emoji">😞</span><span class="label">Awful</span></button></div>
+            <div class="col"><button class="mood-large-btn" data-val="2" onclick="setMood(this)"><span class="emoji">😔</span><span class="label">Sad</span></button></div>
+            <div class="col"><button class="mood-large-btn" data-val="3" onclick="setMood(this)"><span class="emoji">😐</span><span class="label">Okay</span></button></div>
+            <div class="col"><button class="mood-large-btn" data-val="4" onclick="setMood(this)"><span class="emoji">😊</span><span class="label">Good</span></button></div>
+            <div class="col"><button class="mood-large-btn" data-val="5" onclick="setMood(this)"><span class="emoji">🤩</span><span class="label">Great</span></button></div>
+          </div>
+          <label class="form-label">Intensity: <span id="intensityVal">5</span>/10</label>
+          <input type="range" class="intensity-slider mb-4" min="1" max="10" value="5" id="intensity" oninput="document.getElementById('intensityVal').textContent=this.value"/>
+          <label class="form-label">What's affecting your mood?</label>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="tag-btn" onclick="toggleTag(this)">Work</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Family</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Sleep</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Exercise</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Diet</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Social</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Finances</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Health</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Weather</button>
+            <button class="tag-btn" onclick="toggleTag(this)">Loneliness</button>
+          </div>
+          <label class="form-label">Journal note (optional)</label>
+          <textarea class="form-control mb-3" rows="3" id="journalNote" placeholder="What's on your mind today? A few words is fine…"></textarea>
+          <button class="btn btn-brand w-100" onclick="logMood()"><i class="bi bi-check-circle me-2"></i>Log Today's Mood</button>
+        </div>
+      </div>
+
+      <!-- Right: Stats & History -->
+      <div class="col-lg-5">
+        <div class="row g-3 mb-4">
+          <div class="col-4">
+            <div class="streak-badge">
+              <div style="font-size:1.6rem;font-weight:700">7</div>
+              <div style="font-size:0.72rem;opacity:0.85">Day Streak 🔥</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="tracker-card text-center p-3">
+              <div style="font-size:1.6rem;font-family:var(--ff-display);font-weight:700;color:var(--brand)">3.8</div>
+              <div style="font-size:0.72rem;color:var(--muted)">Avg. This Week</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="tracker-card text-center p-3">
+              <div style="font-size:1.6rem;font-family:var(--ff-display);font-weight:700;color:var(--purple)">28</div>
+              <div style="font-size:0.72rem;color:var(--muted)">Total Entries</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="tracker-card mb-4">
+          <h6 class="mb-3">Last 7 Days</h6>
+          <canvas id="moodChart" height="150"></canvas>
+        </div>
+
+        <!-- AI Insight -->
+        <div class="insight-card mb-4">
+          <div class="d-flex gap-2 align-items-start">
+            <i class="bi bi-lightbulb-fill" style="color:var(--purple);font-size:18px;flex-shrink:0;margin-top:2px"></i>
+            <div>
+              <div style="font-weight:600;font-size:0.88rem;margin-bottom:4px">Aria's Insight</div>
+              <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;margin:0" id="insightText">Your mood tends to dip on Sundays and Mondays. This might be related to the transition from weekend to weekday. Practicing a Sunday evening self-care routine could help!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Logs -->
+        <div class="tracker-card">
+          <h6 class="mb-3">Recent Entries</h6>
+          <div id="logHistory">
+            <div class="log-item"><div class="d-flex justify-content-between"><span>😊 Good · Work, Sleep</span><small class="text-muted">Today</small></div><small class="text-muted">Felt productive at work today.</small></div>
+            <div class="log-item" style="border-left-color:#7c3aed"><div class="d-flex justify-content-between"><span>😔 Sad · Loneliness</span><small class="text-muted">Yesterday</small></div><small class="text-muted">Missing friends. Need to reach out more.</small></div>
+            <div class="log-item" style="border-left-color:#d97706"><div class="d-flex justify-content-between"><span>😐 Okay · Work</span><small class="text-muted">2 days ago</small></div><small class="text-muted">Long meeting. Tired but okay.</small></div>
+            <div class="log-item" style="border-left-color:#16a34a"><div class="d-flex justify-content-between"><span>🤩 Great · Exercise</span><small class="text-muted">3 days ago</small></div><small class="text-muted">Morning run felt amazing!</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:11">
+  <div id="logToast" class="toast">
+    <div class="toast-body" style="background:var(--dark);color:white;border-radius:12px;padding:1rem 1.25rem">
+      <i class="bi bi-check-circle-fill text-success me-2"></i>Mood logged! Keep it up 🌟
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Date
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+let selectedMood = null;
+function setMood(btn) {
+  document.querySelectorAll('.mood-large-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedMood = btn.dataset.val;
+}
+function toggleTag(btn) { btn.classList.toggle('active'); }
+
+function logMood() {
+  if (!selectedMood) { alert('Please select a mood first!'); return; }
+  const toast = new bootstrap.Toast(document.getElementById('logToast'), {delay:3500});
+  toast.show();
+  // Update insight
+  const insights = [
+    "You've been consistent this week! Your mood improves on days when you log Exercise.",
+    "Pattern detected: Sleep quality strongly correlates with your mood scores. Aim for 7-8 hours!",
+    "Great job logging today! Regular check-ins help you understand your emotional patterns.",
+    "Your mood seems to dip mid-week. Consider scheduling something enjoyable on Wednesdays!"
+  ];
+  document.getElementById('insightText').textContent = insights[Math.floor(Math.random()*insights.length)];
+}
+
+// Chart
+const ctx = document.getElementById('moodChart').getContext('2d');
+const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const data = [3,4,3,2,4,5,4];
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: days,
+    datasets: [{
+      label: 'Mood',
+      data: data,
+      borderColor: '#0d9488',
+      backgroundColor: 'rgba(13,148,136,0.08)',
+      borderWidth: 2.5,
+      pointBackgroundColor: '#0d9488',
+      pointRadius: 5,
+      fill: true,
+      tension: 0.4
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        min: 1, max: 5,
+        ticks: { stepSize:1, callback: v => ['','😞','😔','😐','😊','🤩'][v], font:{size:14} },
+        grid: { color: 'rgba(0,0,0,0.05)' }
+      },
+      x: { grid: { display: false }, ticks: { font:{size:11} } }
+    }
+  }
+});
+
+window.addEventListener('scroll',()=>{
+  const n=document.getElementById('mainNav');
+  if(n) n.classList.toggle('scrolled',window.scrollY>30);
+});
+</script>
+</body>
+</html>

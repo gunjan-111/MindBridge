@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Counselors — MindBridge</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    .filter-bar { background:white; border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:2rem; }
+    .counselor-full-card { background:white; border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; transition:all 0.3s; height:100%; }
+    .counselor-full-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-3px); }
+    .c-av-lg { width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.15); }
+    .avail-badge { font-size:0.72rem;padding:0.25rem 0.65rem;border-radius:100px;font-weight:600; }
+    .avail-now { background:var(--green-light);color:var(--green); }
+    .avail-soon { background:var(--amber-light);color:var(--amber); }
+    .spec-tag { background:var(--light-bg);color:var(--muted);border-radius:100px;padding:0.2rem 0.65rem;font-size:0.72rem;font-weight:500; }
+    .booking-modal .modal-content { border-radius:var(--radius);border:none;box-shadow:var(--shadow-lg); }
+    .time-slot { border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.9rem;font-size:0.82rem;cursor:pointer;transition:all 0.15s;font-family:var(--ff-body);background:white; }
+    .time-slot:hover, .time-slot.selected { border-color:var(--brand);background:var(--teal-light);color:var(--brand); }
+    .filter-chip { border:1.5px solid var(--border);border-radius:100px;padding:0.3rem 0.9rem;font-size:0.8rem;cursor:pointer;background:white;transition:all 0.15s;font-family:var(--ff-body); }
+    .filter-chip:hover, .filter-chip.active { border-color:var(--brand);background:var(--teal-light);color:var(--brand); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+      <span class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></span>
+      <span class="brand-text">Mind<span>Bridge</span></span>
+    </a>
+    <div class="ms-auto d-flex gap-2">
+      <a href="chat.html" class="btn btn-outline-brand btn-sm">Chat with Aria</a>
+      <a href="login.html" class="btn btn-brand btn-sm">Log In</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="page-hero">
+  <div class="container">
+    <div class="section-tag" style="background:rgba(255,255,255,0.2);color:white">Licensed Professionals</div>
+    <h1 class="mt-2">Find Your Counselor</h1>
+    <p class="mt-2" style="max-width:500px">Connect with verified, licensed therapists and counselors. Book video or text sessions at your convenience.</p>
+    <div class="d-flex gap-3 mt-4 flex-wrap">
+      <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:1rem 1.5rem;color:white;text-align:center">
+        <div style="font-size:1.5rem;font-weight:700;font-family:var(--ff-display)">50+</div>
+        <div style="font-size:0.78rem;opacity:0.8">Counselors</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:1rem 1.5rem;color:white;text-align:center">
+        <div style="font-size:1.5rem;font-weight:700;font-family:var(--ff-display)">₹499</div>
+        <div style="font-size:0.78rem;opacity:0.8">Per Session</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:1rem 1.5rem;color:white;text-align:center">
+        <div style="font-size:1.5rem;font-weight:700;font-family:var(--ff-display)">24hr</div>
+        <div style="font-size:0.78rem;opacity:0.8">Avg. Booking</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-pad" style="background:var(--light-bg)">
+  <div class="container">
+    <!-- Filters -->
+    <div class="filter-bar">
+      <div class="row align-items-center g-3">
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="🔍  Search counselors..." id="searchInput" oninput="filterCards()"/>
+        </div>
+        <div class="col-md-8">
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="filter-chip active" onclick="filterBySpec(this,'all')">All</button>
+            <button class="filter-chip" onclick="filterBySpec(this,'anxiety')">Anxiety</button>
+            <button class="filter-chip" onclick="filterBySpec(this,'depression')">Depression</button>
+            <button class="filter-chip" onclick="filterBySpec(this,'trauma')">Trauma</button>
+            <button class="filter-chip" onclick="filterBySpec(this,'relationships')">Relationships</button>
+            <button class="filter-chip" onclick="filterBySpec(this,'stress')">Stress</button>
+            <button class="filter-chip" onclick="filterBySpec(this,'grief')">Grief</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Counselors Grid -->
+    <div class="row g-4" id="counselorGrid">
+
+      <div class="col-md-6 col-lg-4 counselor-item" data-specs="anxiety depression">
+        <div class="counselor-full-card">
+          <div class="d-flex gap-3 align-items-start mb-3">
+            <div class="c-av-lg" style="background:linear-gradient(135deg,#f093fb,#f5576c)">PR</div>
+            <div>
+              <h5 class="mb-1">Dr. Priya Rao</h5>
+              <div style="font-size:0.8rem;color:var(--muted)">M.Phil Clinical Psychology · 8 yrs</div>
+              <div class="mt-1"><span class="avail-badge avail-now">● Available Now</span></div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            <span class="spec-tag">Anxiety</span><span class="spec-tag">Depression</span><span class="spec-tag">CBT</span><span class="spec-tag">Mindfulness</span>
+          </div>
+          <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Specializes in cognitive behavioral therapy for anxiety and mood disorders. Warm, non-judgmental approach with a focus on practical coping skills.</p>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <div style="color:#f59e0b;font-size:0.9rem">★★★★★</div>
+              <div style="font-size:0.72rem;color:var(--muted)">4.9 · 124 reviews</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600;color:var(--brand)">₹599/session</div>
+              <div style="font-size:0.72rem;color:var(--muted)">Video & Text</div>
+            </div>
+          </div>
+          <button class="btn btn-brand w-100 mt-3" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="setBooking('Dr. Priya Rao')">Book Session</button>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4 counselor-item" data-specs="trauma grief">
+        <div class="counselor-full-card">
+          <div class="d-flex gap-3 align-items-start mb-3">
+            <div class="c-av-lg" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">AK</div>
+            <div>
+              <h5 class="mb-1">Arjun Kumar</h5>
+              <div style="font-size:0.8rem;color:var(--muted)">Counselling Psychologist · 6 yrs</div>
+              <div class="mt-1"><span class="avail-badge avail-now">● Available Now</span></div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            <span class="spec-tag">Trauma</span><span class="spec-tag">PTSD</span><span class="spec-tag">EMDR</span><span class="spec-tag">Grief</span>
+          </div>
+          <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Trained in EMDR therapy for trauma processing. Works with survivors of abuse, loss, and complex PTSD with compassion and patience.</p>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <div style="color:#f59e0b;font-size:0.9rem">★★★★★</div>
+              <div style="font-size:0.72rem;color:var(--muted)">4.8 · 98 reviews</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600;color:var(--brand)">₹549/session</div>
+              <div style="font-size:0.72rem;color:var(--muted)">Video & Text</div>
+            </div>
+          </div>
+          <button class="btn btn-brand w-100 mt-3" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="setBooking('Arjun Kumar')">Book Session</button>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4 counselor-item" data-specs="relationships stress">
+        <div class="counselor-full-card">
+          <div class="d-flex gap-3 align-items-start mb-3">
+            <div class="c-av-lg" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">SM</div>
+            <div>
+              <h5 class="mb-1">Dr. Sara Mehta</h5>
+              <div style="font-size:0.8rem;color:var(--muted)">Ph.D Psychology · 12 yrs</div>
+              <div class="mt-1"><span class="avail-badge avail-soon">◐ Available in 2hrs</span></div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            <span class="spec-tag">Relationships</span><span class="spec-tag">Couples</span><span class="spec-tag">Family</span><span class="spec-tag">Stress</span>
+          </div>
+          <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Expert in interpersonal dynamics, couples therapy, and family systems. Helps clients build healthier communication patterns and emotional bonds.</p>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <div style="color:#f59e0b;font-size:0.9rem">★★★★★</div>
+              <div style="font-size:0.72rem;color:var(--muted)">4.9 · 211 reviews</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600;color:var(--brand)">₹699/session</div>
+              <div style="font-size:0.72rem;color:var(--muted)">Video & Text</div>
+            </div>
+          </div>
+          <button class="btn btn-brand w-100 mt-3" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="setBooking('Dr. Sara Mehta')">Book Session</button>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4 counselor-item" data-specs="stress anxiety depression">
+        <div class="counselor-full-card">
+          <div class="d-flex gap-3 align-items-start mb-3">
+            <div class="c-av-lg" style="background:linear-gradient(135deg,#fa709a,#fee140)">RV</div>
+            <div>
+              <h5 class="mb-1">Rohan Varma</h5>
+              <div style="font-size:0.8rem;color:var(--muted)">MSc Counselling · 5 yrs</div>
+              <div class="mt-1"><span class="avail-badge avail-now">● Available Now</span></div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            <span class="spec-tag">Stress</span><span class="spec-tag">Burnout</span><span class="spec-tag">Work-Life</span><span class="spec-tag">Anxiety</span>
+          </div>
+          <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Helps professionals manage burnout, work stress, and life transitions. Uses solution-focused therapy with practical mindfulness tools.</p>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <div style="color:#f59e0b;font-size:0.9rem">★★★★☆</div>
+              <div style="font-size:0.72rem;color:var(--muted)">4.7 · 76 reviews</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600;color:var(--brand)">₹499/session</div>
+              <div style="font-size:0.72rem;color:var(--muted)">Video & Text</div>
+            </div>
+          </div>
+          <button class="btn btn-brand w-100 mt-3" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="setBooking('Rohan Varma')">Book Session</button>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4 counselor-item" data-specs="depression grief anxiety">
+        <div class="counselor-full-card">
+          <div class="d-flex gap-3 align-items-start mb-3">
+            <div class="c-av-lg" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)">NP</div>
+            <div>
+              <h5 class="mb-1">Nidhi Patel</h5>
+              <div style="font-size:0.8rem;color:var(--muted)">Clinical Psychologist · 9 yrs</div>
+              <div class="mt-1"><span class="avail-badge avail-soon">◐ Available Tomorrow</span></div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            <span class="spec-tag">Depression</span><span class="spec-tag">Grief</span><span class="spec-tag">Self-esteem</span><span class="spec-tag">Anxiety</span>
+          </div>
+          <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Specializes in grief counseling and depression. Uses an integrative approach combining talk therapy, mindfulness, and expressive arts.</p>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <div style="color:#f59e0b;font-size:0.9rem">★★★★★</div>
+              <div style="font-size:0.72rem;color:var(--muted)">4.9 · 143 reviews</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600;color:var(--brand)">₹649/session</div>
+              <div style="font-size:0.72rem;color:var(--muted)">Video & Text</div>
+            </div>
+          </div>
+          <button class="btn btn-brand w-100 mt-3" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="setBooking('Nidhi Patel')">Book Session</button>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4 counselor-item" data-specs="trauma relationships stress">
+        <div class="counselor-full-card">
+          <div class="d-flex gap-3 align-items-start mb-3">
+            <div class="c-av-lg" style="background:linear-gradient(135deg,#11998e,#38ef7d)">KS</div>
+            <div>
+              <h5 class="mb-1">Kiran Sharma</h5>
+              <div style="font-size:0.8rem;color:var(--muted)">M.Phil Psychiatry · 7 yrs</div>
+              <div class="mt-1"><span class="avail-badge avail-now">● Available Now</span></div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            <span class="spec-tag">Youth</span><span class="spec-tag">Teen Mental Health</span><span class="spec-tag">Trauma</span>
+          </div>
+          <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Works specifically with young adults and teens facing academic pressure, identity struggles, and family conflict. Creates a safe, judgement-free space.</p>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <div style="color:#f59e0b;font-size:0.9rem">★★★★★</div>
+              <div style="font-size:0.72rem;color:var(--muted)">4.8 · 89 reviews</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600;color:var(--brand)">₹499/session</div>
+              <div style="font-size:0.72rem;color:var(--muted)">Video & Text</div>
+            </div>
+          </div>
+          <button class="btn btn-brand w-100 mt-3" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="setBooking('Kiran Sharma')">Book Session</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade booking-modal" id="bookModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0" id="modalTitle">Book Session</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Session Type</label>
+        <div class="d-flex gap-2">
+          <button class="time-slot selected" onclick="selectType(this,'video')"><i class="bi bi-camera-video me-1"></i>Video</button>
+          <button class="time-slot" onclick="selectType(this,'text')"><i class="bi bi-chat-dots me-1"></i>Text</button>
+          <button class="time-slot" onclick="selectType(this,'phone')"><i class="bi bi-telephone me-1"></i>Phone</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Select Date</label>
+        <input type="date" class="form-control" id="bookDate"/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Available Time Slots</label>
+        <div class="d-flex gap-2 flex-wrap" id="timeSlots">
+          <button class="time-slot" onclick="selectTime(this)">9:00 AM</button>
+          <button class="time-slot" onclick="selectTime(this)">10:30 AM</button>
+          <button class="time-slot" onclick="selectTime(this)">12:00 PM</button>
+          <button class="time-slot" onclick="selectTime(this)">2:00 PM</button>
+          <button class="time-slot" onclick="selectTime(this)">3:30 PM</button>
+          <button class="time-slot" onclick="selectTime(this)">5:00 PM</button>
+          <button class="time-slot" onclick="selectTime(this)">7:00 PM</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">What would you like to discuss? (optional)</label>
+        <textarea class="form-control" rows="2" placeholder="Brief context helps the counselor prepare..."></textarea>
+      </div>
+      <button class="btn btn-brand w-100" onclick="confirmBooking()">Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:11">
+  <div id="bookToast" class="toast" role="alert">
+    <div class="toast-body" style="background:var(--dark);color:white;border-radius:12px;padding:1rem 1.25rem">
+      <i class="bi bi-check-circle-fill text-success me-2"></i>
+      <span id="toastMsg">Session booked successfully!</span>
+    </div>
+  </div>
+</div>
+
+<!-- Footer simple -->
+<footer class="site-footer mt-0">
+  <div class="container text-center py-4">
+    <small class="text-muted" style="color:rgba(255,255,255,0.4)!important">© 2025 MindBridge · <a href="../index.html" style="color:var(--brand)">Back to Home</a></small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let currentCounselor = '';
+
+function setBooking(name) {
+  currentCounselor = name;
+  document.getElementById('modalTitle').textContent = `Book with ${name}`;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('bookDate').value = today;
+  document.getElementById('bookDate').min = today;
+}
+function selectType(btn, type) {
+  document.querySelectorAll('#bookModal .time-slot').forEach(b => { if(b.closest('#timeSlots') === null && !b.classList.contains('selected')) {} });
+  btn.parentElement.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function selectTime(btn) {
+  document.querySelectorAll('#timeSlots .time-slot').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function confirmBooking() {
+  const modal = bootstrap.Modal.getInstance(document.getElementById('bookModal'));
+  modal.hide();
+  const toast = new bootstrap.Toast(document.getElementById('bookToast'), {delay: 4000});
+  document.getElementById('toastMsg').textContent = `Session with ${currentCounselor} confirmed! Check your email for details.`;
+  toast.show();
+}
+function filterBySpec(btn, spec) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.counselor-item').forEach(item => {
+    if (spec === 'all' || item.dataset.specs.includes(spec)) {
+      item.style.display = '';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+function filterCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.counselor-item').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+window.addEventListener('scroll',()=>{
+  const n=document.getElementById('mainNav');
+  if(n) n.classList.toggle('scrolled',window.scrollY>30);
+});
+</script>
+</body>
+</html>
