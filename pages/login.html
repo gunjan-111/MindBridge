@@ -1,6 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Log In — MindBridge</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    body { background: var(--light, #f8f7ff); min-height: 100vh; display: flex; flex-direction: column; }
+    .auth-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; padding: 100px 16px 40px; }
+    .auth-card {
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(108,99,255,.12);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 440px;
+    }
+    .auth-logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 28px; }
+    .auth-logo .brand-icon { background: linear-gradient(135deg,#6c63ff,#f5576c); border-radius: 12px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; }
+    .auth-logo .brand-text { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: #1a1a2e; }
+    .auth-logo .brand-text span { color: #6c63ff; }
+    .auth-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: #1a1a2e; text-align: center; margin-bottom: 6px; }
+    .auth-sub { color: #666; text-align: center; font-size: .95rem; margin-bottom: 28px; }
+    .form-label { font-weight: 500; color: #333; font-size: .9rem; }
+    .form-control {
+      border: 1.5px solid #e0dff5;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: .95rem;
+      transition: border-color .2s;
+    }
+    .form-control:focus { border-color: #6c63ff; box-shadow: 0 0 0 3px rgba(108,99,255,.1); }
+    .input-group .form-control { border-right: none; }
+    .input-group .btn-outline-secondary {
+      border: 1.5px solid #e0dff5;
+      border-left: none;
+      border-radius: 0 12px 12px 0;
+      background: #fafafa;
+      color: #888;
+    }
+    .btn-auth {
+      background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-weight: 600;
+      font-size: 1rem;
+      width: 100%;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn-auth:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,.3); color: #fff; }
+    .btn-auth:disabled { opacity: .7; transform: none; }
+    .auth-divider { text-align: center; color: #aaa; font-size: .85rem; margin: 18px 0; position: relative; }
+    .auth-divider::before, .auth-divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: #e8e8f0; }
+    .auth-divider::before { left: 0; }
+    .auth-divider::after { right: 0; }
+    .auth-switch { text-align: center; font-size: .9rem; color: #666; margin-top: 20px; }
+    .auth-switch a { color: #6c63ff; font-weight: 600; text-decoration: none; }
+    .auth-switch a:hover { text-decoration: underline; }
+    .alert-auth { border-radius: 12px; font-size: .9rem; }
+    .spinner-border-sm { width: 1rem; height: 1rem; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+      <span class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></span>
+      <span class="brand-text">Mind<span>Bridge</span></span>
+    </a>
+  </div>
+</nav>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="brand-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+      <div class="brand-text">Mind<span>Bridge</span></div>
+    </div>
+    <h1 class="auth-title">Welcome Back 💙</h1>
+    <p class="auth-sub">Log in to continue your mental wellness journey.</p>
+
+    <div id="alertBox" class="alert alert-auth d-none"></div>
+
+    <div class="mb-3">
+      <label class="form-label">Email Address</label>
+      <input type="email" class="form-control" id="email" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Password</label>
+      <div class="input-group">
+        <input type="password" class="form-control" id="password" placeholder="Your password" autocomplete="current-password"/>
+        <button class="btn btn-outline-secondary" type="button" id="togglePwd">
+          <i class="bi bi-eye" id="eyeIcon"></i>
+        </button>
+      </div>
+    </div>
+    <div class="mb-4 text-end">
+      <a href="#" style="font-size:.85rem;color:#6c63ff;text-decoration:none;">Forgot password?</a>
+    </div>
+
+    <button class="btn-auth" id="loginBtn" onclick="handleLogin()">
+      <span id="loginText">Log In</span>
+      <span id="loginSpinner" class="d-none"><span class="spinner-border spinner-border-sm me-2"></span>Logging in...</span>
+    </button>
+
+    <div class="auth-divider">or</div>
+    <div class="auth-switch">
+      Don't have an account? <a href="register.html">Create one free</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Redirect if already logged in
+  if (localStorage.getItem('mb_token')) {
+    window.location.href = '../index.html';
+  }
+
+  // Toggle password visibility
+  document.getElementById('togglePwd').addEventListener('click', () => {
+    const pwd = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (pwd.type === 'password') {
+      pwd.type = 'text';
+      icon.className = 'bi bi-eye-slash';
+    } else {
+      pwd.type = 'password';
+      icon.className = 'bi bi-eye';
+    }
+  });
+
+  // Allow Enter key
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  function showAlert(msg, type = 'danger') {
+    const box = document.getElementById('alertBox');
+    box.className = `alert alert-${type} alert-auth`;
+    box.textContent = msg;
+    box.classList.remove('d-none');
+  }
+
+  async function handleLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+      showAlert('Please enter your email and password.');
+      return;
+    }
+
+    // Show loading state
+    document.getElementById('loginBtn').disabled = true;
+    document.getElementById('loginText').classList.add('d-none');
+    document.getElementById('loginSpinner').classList.remove('d-none');
+    document.getElementById('alertBox').classList.add('d-none');
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showAlert(data.message || 'Login failed. Please check your credentials.');
+      } else {
+        // ✅ Save to localStorage
+        localStorage.setItem('mb_token', data.token);
+        localStorage.setItem('mb_user', JSON.stringify(data.user));
+        // Redirect to homepage
+        window.location.href = '../index.html';
+      }
+    } catch (err) {
+      showAlert('Could not connect to server. Make sure the backend is running (npm start).');
+    } finally {
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginText').classList.remove('d-none');
+      document.getElementById('loginSpinner').classList.add('d-none');
+    }
+  }
+</script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Log In — MindBridge</title>
@@ -181,4 +377,4 @@ alert(data.message);
 </script>
 
 </body>
-</html>
+</html> -->
